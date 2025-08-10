@@ -1,0 +1,128 @@
+# ---- OS / Editors ----
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Linux
+*~
+
+# VS Code (uncomment if you don't want to commit workspace settings)
+.vscode/
+
+# JetBrains Rider / IntelliJ
+.idea/
+
+# ---- Visual Studio / .NET ----
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Bb]uild/
+[Bb]ld/
+[Ll]og/
+[Ll]ogs/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Rr]elease*/
+[Dd]ebug*/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# NuGet
+*.nupkg
+# If using packages folder, ignore it except build/repositories.config
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# MSBuild artifacts
+*.tlog
+*.zip.tmp
+project.lock.json
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+# Publish / deploy
+**/Properties/PublishProfiles/
+*.pubxml
+*.publishsettings
+*.pubxml.user
+app.publish/
+
+# IIS / ASP.NET
+_IISExpress/
+.vsconfig
+*.iiscfg
+
+# Entity Framework / Migrations cache files
+*.DesignTime.*.json
+
+# Secrets / Certificates (KEEP OUT OF GIT)
+*.pfx
+*.p12
+*.p7b
+*.snk
+*.key
+*.cer
+*.pem
+*.jks
+*.keystore
+*.pvk
+
+# Environment files
+*.env
+*.env.*
+
+# SQLite / local DBs
+*.mdf
+*.ldf
+*.ndf
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+
+# Resharper / Code analysis
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NCrunch
+_nCrunch_*
+.*crunch*.local.xml
+
+# StyleCop
+StyleCopCache/
+
+# Rider / Roslyn cache
+*.sln.iml
+
+# Reports / Logs
+*.log
+*.etl
+
+# Others you likely don't want
+*.cache
+*.tmp
+*.bak
+*.orig
