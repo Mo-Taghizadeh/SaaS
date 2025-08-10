@@ -1,7 +1,11 @@
 ﻿using AuthService.Application.Common.Interfaces;
+using AuthService.Infrastructure.ExternalServices;
 using AuthService.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using AuthService.Application.Common.Behaviors;
+using FluentValidation;
 using System.Reflection;
+using AuthService.Api.Filters;
 using AuthService.Infrastructure.JWT;
 using AuthService.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +26,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 // DbContext
 builder.Services.AddDbContext<AuthDbContext>(opt =>
@@ -44,9 +50,22 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(AuthService.Application.Services.Users.Command.RegisterUserCommand).Assembly);
 });
 
+// ثبت همه Validatorها از اسمبلی Application
+builder.Services.AddValidatorsFromAssembly(
+    typeof(AuthService.Application.Services.Users.Command.RegisterUserCommand).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+builder.Services.AddControllers(o =>
+{
+    o.Filters.Add<ResultStatusFilter>(); // global
+});
+
 // پیاده‌سازی‌های زیرساخت
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddSingleton<IJwtProvider, JwtProvider>();
+
+//EmailSender
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
 // JWT Auth (برای محافظت از سایر endpointها)
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
@@ -68,8 +87,6 @@ builder.Services
 
 
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

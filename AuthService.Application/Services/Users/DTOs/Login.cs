@@ -15,6 +15,7 @@ namespace AuthService.Application.Services.Users.DTOs
     public sealed class LoginResponse
     {
         public string AccessToken { get; init; } = default!;
+        public string RefreshToken { get; init; } = default!;
         public DateTime ExpiresAtUtc { get; init; }
     }
 }

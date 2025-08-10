@@ -18,6 +18,9 @@ namespace AuthService.Infrastructure.Context
         }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<OneTimeToken> OneTimeTokens => Set<OneTimeToken>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

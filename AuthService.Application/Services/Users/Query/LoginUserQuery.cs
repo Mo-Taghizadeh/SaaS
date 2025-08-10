@@ -2,6 +2,7 @@
 using AuthService.Application.Common.Utils;
 using AuthService.Application.Common.ViewModels;
 using AuthService.Application.Services.Users.DTOs;
+using AuthService.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -58,10 +59,26 @@ namespace AuthService.Application.Services.Users.Query
             var expires = DateTime.UtcNow.Add(_jwt.AccessTokenLifetime);
             var token = _jwt.GenerateToken(claims, expires);
 
+            var rawRt = Crypto.NewSecureToken();
+            var hashRt = Crypto.Sha256(rawRt);
+
+            await _db.RefreshTokens.AddAsync(new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                TokenHash = hashRt,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedByIp = null, // می‌تونی از req بیاری
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(30)
+            }, ct);
+
+            await _db.SaveChangesAsync(ct);
+
             return BaseResult_VM<LoginResponse>.Ok(new LoginResponse
             {
                 AccessToken = token,
-                ExpiresAtUtc = expires
+                ExpiresAtUtc = expires,
+                RefreshToken = rawRt
             });
         }
     }
