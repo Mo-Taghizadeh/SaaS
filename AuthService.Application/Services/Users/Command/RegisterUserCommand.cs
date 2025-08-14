@@ -2,6 +2,7 @@
 using AuthService.Application.Common.Utils;
 using AuthService.Application.Common.ViewModels;
 using AuthService.Application.Services.Users.DTOs;
+using AuthService.SharedKernel.Messaging.Contracts.Auth;
 using AuthService.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +23,13 @@ namespace AuthService.Application.Services.Users.Command
     {
         private readonly IAuthDbContext _db;
         private readonly IPasswordHasher _hasher;
+        private readonly IMessageBus _bus;
 
-        public RegisterUserHandler(IAuthDbContext db, IPasswordHasher hasher)
+        public RegisterUserHandler(IAuthDbContext db, IPasswordHasher hasher, IMessageBus bus)
         {
             _db = db;
             _hasher = hasher;
+            _bus = bus;
         }
 
         public async Task<BaseResult_VM<RegisterResponse>> Handle(RegisterUserCommand cmd, CancellationToken ct)
@@ -59,12 +62,14 @@ namespace AuthService.Application.Services.Users.Command
             await _db.Users.AddAsync(user, ct);
             await _db.SaveChangesAsync(ct);
 
+            await _bus.Publish(new UserRegistered(user.Id, user.Email, user.Username, DateTime.UtcNow), ct);
+
             return BaseResult_VM<RegisterResponse>.Ok(new RegisterResponse
             {
                 UserId = user.Id,
                 Username = user.Username,
                 Email = user.Email
-            });
+            }, "User registered.");
         }
     }
 }
