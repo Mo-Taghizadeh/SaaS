@@ -4,6 +4,35 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+	  <!-- هویت پکیج -->
+	  <PackageId>AuthService.SharedKernel</PackageId>
+	  <Version>1.0.0</Version>
+	  <!-- بعداً با هر تغییر، نسخه را بالا ببر -->
+	  <Authors>AtenaTeam</Authors>
+	  <Company>ArmanTose'eNarmafzarIranian</Company>
+	  <Description>Shared message contracts for LMS microservices.</Description>
+	  <PackageTags>lms;contracts;messaging;rabbitmq;sharedkernel</PackageTags>
+
+	  <!-- کیفیت بیلد -->
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	  <!-- deterministic -->
+	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+	  <!-- اختیاری ولی خوبه --><!--
+	  <RepositoryUrl>https://git.example.com/yourrepo/SharedKernel</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  --><!-- یا فایل LICENSE --><!--
+	  <PackageReadmeFile>README.md</PackageReadmeFile>-->
+	  
   </PropertyGroup>
+
+	<ItemGroup>
+		<!-- SourceLink برای دیباگ بهتر (اختیاری) -->
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
 
 </Project>

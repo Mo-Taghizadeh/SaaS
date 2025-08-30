@@ -30,7 +30,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["Rabbit:Host"], "/", h =>
+        cfg.Host(builder.Configuration["Rabbit:Host"],5672, "/", h =>
         {
             h.Username(builder.Configuration["Rabbit:User"]);
             h.Password(builder.Configuration["Rabbit:Pass"]);
@@ -103,9 +103,6 @@ builder.Services
     });
 #endregion
 
-
-var app = builder.Build();
-
 #region ValidatorPipeLine
 // ثبت همه Validatorها از اسمبلی Application
 builder.Services.AddValidatorsFromAssembly(
@@ -117,6 +114,9 @@ builder.Services.AddControllers(o =>
     o.Filters.Add<ResultStatusFilter>(); // global
 });
 #endregion
+var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
