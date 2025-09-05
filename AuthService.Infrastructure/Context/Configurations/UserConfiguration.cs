@@ -13,73 +13,47 @@ namespace AuthService.Infrastructure.Context.Configurations
     {
         public void Configure(EntityTypeBuilder<User> b)
         {
-            // جدول و اسکیمـا
-            b.ToTable("Users", schema: "auth");
+            b.ToTable("Users", "auth");
+            b.HasKey(x => x.Id);
 
-            // کلید اصلی + تولید مقدار سمت SQL Server
-            b.HasKey(u => u.Id);
-            b.Property(u => u.Id)
-             .HasColumnType("uniqueidentifier")
-             .HasDefaultValueSql("NEWSEQUENTIALID()");
+            b.Property(x => x.Username)
+                .HasMaxLength(50);
 
-            // Username
-            b.Property(u => u.Username)
-             .IsRequired()
-             .HasMaxLength(50);
+            b.Property(x => x.Status)
+                .HasConversion<byte>()
+                .IsRequired();
 
-            // NormalizedUsername (برای یکتا)
-            b.Property(u => u.NormalizedUsername)
-             .IsRequired()
-             .HasMaxLength(50);
+            b.Property(x => x.CreatedAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("SYSUTCDATETIME()");
 
-            // Email
-            b.Property(u => u.Email)
-             .IsRequired()
-             .HasMaxLength(320); // مطابق RFC (local-part تا 64 + domain تا 255)
+            b.Property(x => x.ModifiedAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("SYSUTCDATETIME()");
 
-            // NormalizedEmail (برای یکتا)
-            b.Property(u => u.NormalizedEmail)
-             .IsRequired()
-             .HasMaxLength(320);
+            b.Property(x => x.RowVersion)
+                .IsRowVersion()
+                .IsConcurrencyToken();
 
-            // PasswordHash
-            b.Property(u => u.PasswordHash)
-             .IsRequired()
-             .HasMaxLength(256); // بستگی به الگوریتمت؛ 256 برای Argon2/Bcrypt Base64 معمولاً کافیه
+            // ایندکس اختیاری روی Username (غیر یونیک چون ممکنه null)
+            b.HasIndex(x => x.Username)
+             .HasDatabaseName("IX_Users_Username");
 
-            // IsActive
-            b.Property(u => u.IsActive)
-             .HasDefaultValue(true)
-             .IsRequired();
+            // روابط
+            b.HasMany(x => x.Contacts)
+             .WithOne(x => x.User)
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
 
-            // CreatedAt: مقدار پیش‌فرض UTC از SQL
-            b.Property(u => u.CreatedAt)
-             .HasColumnType("datetime2")
-             .HasDefaultValueSql("SYSUTCDATETIME()")
-             .IsRequired();
+            b.HasOne(x => x.Credential)
+             .WithOne(x => x.User)
+             .HasForeignKey<UserCredential>(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
 
-            // ModifiedAt 
-            b.Property(u => u.ModifiedAt)
-             .HasColumnType("datetime2")
-             .HasDefaultValue(null);
-
-            // RowVersion (کنترل همزمانی)
-            b.Property(u => u.RowVersion)
-             .IsRowVersion()
-             .IsConcurrencyToken();
-
-            // ایندکس‌های منحصربه‌فرد (Case-insensitive با Normalized*)
-            b.HasIndex(u => u.NormalizedUsername)
-             .HasDatabaseName("UX_Users_NormalizedUsername")
-             .IsUnique();
-
-            b.HasIndex(u => u.NormalizedEmail)
-             .HasDatabaseName("UX_Users_NormalizedEmail")
-             .IsUnique();
-
-            // ایندکس کمکی برای گزارش‌گیری/مرتب‌سازی بر اساس تاریخ
-            b.HasIndex(u => u.CreatedAt)
-             .HasDatabaseName("IX_Users_CreatedAt");
+            b.HasMany(x => x.ExternalLogins)
+             .WithOne(x => x.User)
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

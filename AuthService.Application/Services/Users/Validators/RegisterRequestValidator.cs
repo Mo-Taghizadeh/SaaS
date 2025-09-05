@@ -13,17 +13,30 @@ namespace AuthService.Application.Services.Users.Validators
         public RegisterRequestValidator()
         {
             RuleFor(x => x.Username)
-                .NotEmpty().WithMessage("Username is required.")
-                .MaximumLength(50);
-
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Invalid email.")
-                .MaximumLength(320);
+            .NotEmpty().MinimumLength(3).MaximumLength(50);
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(8);
+                .NotEmpty().MinimumLength(8);
+
+            RuleFor(x => new { x.Email, x.Mobile }).Must(x =>
+            {
+                var hasEmail = !string.IsNullOrWhiteSpace(x.Email);
+                var hasMobile = !string.IsNullOrWhiteSpace(x.Mobile);
+                return hasEmail ^ hasMobile; // دقیقا یکی
+            }).WithMessage("یکی از ایمیل یا موبایل باید وارد شود (نه هر دو).");
+
+            When(x => !string.IsNullOrWhiteSpace(x.Email), () =>
+            {
+                RuleFor(x => x.Email!)
+                    .EmailAddress().MaximumLength(320);
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.Mobile), () =>
+            {
+                RuleFor(x => x.Mobile!)
+                    .Matches(@"^[0-9+]{9,20}$")
+                    .WithMessage("فرمت موبایل نامعتبر است.");
+            });
         }
     }
 }

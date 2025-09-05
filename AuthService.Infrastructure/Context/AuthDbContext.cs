@@ -20,6 +20,10 @@ namespace AuthService.Infrastructure.Context
         public DbSet<User> Users => Set<User>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<OneTimeToken> OneTimeTokens => Set<OneTimeToken>();
+        public DbSet<UserContact> UserContacts => Set<UserContact>();
+        public DbSet<UserCredential> UserCredentials => Set<UserCredential>();
+        public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
+        public DbSet<VerificationToken> VerificationTokens => Set<VerificationToken>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

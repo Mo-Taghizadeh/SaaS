@@ -3,6 +3,7 @@ using AuthService.Application.Common.Utils;
 using AuthService.Application.Common.ViewModels;
 using AuthService.Application.Services.Users.DTOs;
 using AuthService.Domain.Entities;
+using AuthService.Domain.Entities.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -34,30 +35,24 @@ namespace AuthService.Application.Services.Users.Query
 
         public async Task<BaseResult_VM<LoginResponse>> Handle(LoginUserQuery cmd, CancellationToken ct)
         {
-            var r = cmd.Request;
-            if (string.IsNullOrWhiteSpace(r.EmailOrUsername) || string.IsNullOrWhiteSpace(r.Password))
-                return BaseResult_VM<LoginResponse>.Fail((int)ErrorCodes.ValidationFailed, "Credentials required.");
+            // پیدا کردن یوزر از طریق Contact
+            var contact = await _db.UserContacts
+                .Include(c => c.User).ThenInclude(u => u.Credential)
+                .Where(c => (c.Type == ContactType.Email && c.EmailLower == cmd.Email.ToLower())
+                         || (c.Type == ContactType.Mobile && c.Value == NormalizeMobile(cmd.Mobile)))
+                .SingleOrDefaultAsync(ct);
 
-            var key = r.EmailOrUsername.Trim();
-            var nEmail = Normalizer.NormalizeEmail(key);
-            var nUser = Normalizer.NormalizeUsername(key);
+            if (contact == null || contact.User.Status != UserStatus.Active)
+                return BaseResult_VM.Failure("حساب کاربری یافت نشد یا غیرفعال است.");
 
-            var user = await _db.Users.FirstOrDefaultAsync(
-                x => x.NormalizedEmail == nEmail || x.NormalizedUsername == nUser, ct);
+            var user = contact.User;
 
-            if (user is null || !_hasher.Verify(r.Password, user.PasswordHash) || !user.IsActive)
-                return BaseResult_VM<LoginResponse>.Fail((int)ErrorCodes.Unauthorized, "Invalid credentials.");
+            // بررسی پسورد
+            if (!_passwordHasher.Verify(user.Credential.PasswordHash, cmd.Password))
+                return BaseResult_VM.Failure("رمز عبور نادرست است.");
 
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.Username ?? ""),
-                new(ClaimTypes.Email, user.Email ?? ""),
-                new(ClaimTypes.Role, "User")
-            };
-
-            var expires = DateTime.UtcNow.Add(_jwt.AccessTokenLifetime);
-            var token = _jwt.GenerateToken(claims, expires);
+            // تولید JWT
+            var token = _jwtService.Generate(user.Id, user.Username, ...);س
 
             var rawRt = Crypto.NewSecureToken();
             var hashRt = Crypto.Sha256(rawRt);
