@@ -8,9 +8,10 @@ namespace AuthService.Application.Services.Users.DTOs
 {
     public sealed class RegisterRequest
     {
-        public string Username { get; set; } = default!;
-        public string Email { get; set; } = default!;
-        public string Password { get; set; } = default!;
+        public string Username { get; init; } = default!;
+        public string? Email { get; init; }   // یکی از Email/Mobile باید پر شود
+        public string? Mobile { get; init; }
+        public string Password { get; init; } = default!;
     }
 
     public sealed class RegisterResponse

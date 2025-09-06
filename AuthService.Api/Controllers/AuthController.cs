@@ -20,7 +20,7 @@ namespace AuthService.Api.Controllers
         public AuthController(IMediator mediator) => _mediator = mediator;
 
         [HttpPost("Register")]
-        public async Task<ActionResult<BaseResult_VM<RegisterResponse>>> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<ActionResult<BaseResult_VM<AuthTokens_VM>>> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
         {
             return Ok(await _mediator.Send(command, cancellationToken));
         }

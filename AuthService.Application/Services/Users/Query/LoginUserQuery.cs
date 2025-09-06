@@ -52,7 +52,7 @@ namespace AuthService.Application.Services.Users.Query
                 return BaseResult_VM.Failure("رمز عبور نادرست است.");
 
             // تولید JWT
-            var token = _jwtService.Generate(user.Id, user.Username, ...);س
+            var token = _jwtService.Generate(user.Id, user.Username, ...);
 
             var rawRt = Crypto.NewSecureToken();
             var hashRt = Crypto.Sha256(rawRt);

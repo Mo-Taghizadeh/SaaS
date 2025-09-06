@@ -83,24 +83,29 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 // پیاده‌سازی‌های زیرساخت
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
-builder.Services.AddSingleton<IJwtProvider, JwtProvider>();
-// JWT Auth (برای محافظت از سایر endpointها)
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
-    {
-        o.TokenValidationParameters = new()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IAuthTokenService, JwtTokenService>();
+
+
+//builder.Services.AddSingleton<IJwtProvider, JwtProvider>();
+//// JWT Auth (برای محافظت از سایر endpointها)
+//var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
+//builder.Services
+//    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(o =>
+//    {
+//        o.TokenValidationParameters = new()
+//        {
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new SymmetricSecurityKey(key),
+//            ValidateIssuer = true,
+//            ValidateAudience = true,
+//            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//            ValidAudience = builder.Configuration["Jwt:Audience"],
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
 #endregion
 
 #region ValidatorPipeLine

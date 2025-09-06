@@ -11,6 +11,10 @@ namespace AuthService.Application.Common.Interfaces
     public interface IAuthDbContext
     {
         DbSet<User> Users { get; }
+        DbSet<UserContact> UserContacts { get; }
+        DbSet<UserCredential> UserCredentials { get; }
+        DbSet<ExternalLogin> ExternalLogins { get; }
+        DbSet<VerificationToken> VerificationTokens { get; }
         DbSet<RefreshToken> RefreshTokens { get; }
         DbSet<OneTimeToken> OneTimeTokens { get; } 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
